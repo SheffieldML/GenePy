@@ -1,0 +1,213 @@
+import collections
+from pandas import DataFrame
+import numpy as np
+from pandas import concat
+from scipy.special import erfc
+
+
+## FUNCTIONS
+## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## ## 
+
+## define the table of codons/aminoacids
+def create_codon_table():
+   bases = ['t', 'c', 'a', 'g']
+   codons = [a+b+c for a in bases for b in bases for c in bases]
+   amino_acids = 'FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG'
+   codon_table = dict(zip(codons, amino_acids))
+   return(codon_table)
+
+def create_aminoacids_table():
+  codon_dict = create_codon_table()
+  amin_dict = {}
+  for k, v in codon_dict.iteritems():
+    amin_dict.setdefault(v, []).append(k)
+  return(amin_dict)
+
+def generate_random_sequence(seq):
+  amin_dict = create_aminoacids_table()
+  codon_dict = create_codon_table()
+  trans_seq = translate(seq, codon_dict)
+  Namin = len(trans_seq)
+  new_seq = ''
+  for k in range(Namin):
+        redundant_codons = amin_dict[trans_seq[k]]
+        Range = range(len(redundant_codons))
+        np.random.shuffle(Range)
+        new_seq=new_seq +redundant_codons[Range[0]]   
+  return(new_seq)
+
+## define the table of codons/aminoacids pairs
+def create_codon_pairs_table():
+   bases = ['t', 'c', 'a', 'g']
+   codons = [a+b+c for a in bases for b in bases for c in bases]
+   amino_acids = 'FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG'
+   codon_pairs = [a+b for a in codons for b in codons]
+   amino_acids_pairs = [a+b for a in amino_acids for b in amino_acids]
+   codon_pairs_table = dict(zip(codon_pairs, amino_acids_pairs))
+   return(codon_pairs_table)
+
+## define the table of codons/aminoacids triplets
+def create_codon_triplets_table():
+   bases = ['t', 'c', 'a', 'g']
+   codons = [a+b+c for a in bases for b in bases for c in bases]
+   amino_acids = 'FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG'
+   codon_triplets = [a+b+c for a in codons for b in codons for c in codons]
+   amino_acids_triplets = [a+b+c for a in amino_acids for b in amino_acids for c in amino_acids]
+   codon_triplets_table = dict(zip(codon_triplets, amino_acids_triplets))
+   return(codon_triplets_table)
+
+## translate gene seqence to aminoacids sequence
+def translate(seq, code):
+   return "".join((code[seq[i:i+3]] for i in range(0, len(seq)-len(seq)%3, 3)))
+
+## function to counts from a sequence
+def count_codons(seq):
+  codon_table = create_codon_table()
+  counts = collections.defaultdict(int)
+  for codon in codon_table.keys(): counts[codon] = 0
+  for i in range(0,len(seq)-len(seq)%3,3): codon = seq[i:i+3] ; counts[codon] += 1
+  return(counts)
+
+## calculates the number of codons of a sequence
+def number_codons(seq):
+   number = len(seq)-len(seq)%3
+   return number
+
+## fucntion to find lists within other lists
+find = lambda searchList, elem: [[i for i, x in enumerate(searchList) if x == e] for e in elem]
+
+def geomean(num_list):
+   return sum(num_list) ** (1.0/len(num_list))
+
+## codon adaptation index
+def codon_adaptation_index(seq):     
+    codon_table = create_codon_table()
+    trans_seq = translate(seq, codon_table)
+    codon_counts = count_codons(seq)
+    CU = [(codon, codon_table[codon], float(codon_counts[codon])) for codon in codon_counts.keys()]
+    headers_CU = ['codon','aminoacid','n_codons',]
+    CU = DataFrame(CU, columns=headers_CU)
+    W = [CU['n_codons'][k]/float(max(CU['n_codons'][CU['aminoacid']==CU['aminoacid'][k]])) for k in range(0,64)]  
+    W = np.array(W)
+    W[np.isnan(W)]=0
+    cai = geomean(W)
+    return cai
+
+## function to count codon pairs from a sequence
+def count_codon_pairs(seq):
+  codon_pairs_table = create_codon_pairs_table()
+  counts = collections.defaultdict(int)
+  for codon in codon_pairs_table.keys(): counts[codon] = 0
+  for i in range(0,len(seq)-len(seq)%6,6): codon = seq[i:i+6] ; counts[codon] += 1
+  return(counts)
+
+## function to count codon triplets from a sequence
+def count_codon_triplets(seq):
+  codon_triplets_table = create_codon_triplets_table()
+  counts = collections.defaultdict(int)
+  for codon in codon_triplets_table.keys(): counts[codon] = 0
+  for i in range(0,len(seq)-len(seq)%9,9): codon = seq[i:i+9] ; counts[codon] += 1
+  return(counts)
+
+## calculates the number of codons of a sequence
+def count_number_codons(seq):
+   number = len(seq)/3-len(seq)%3
+   return number
+
+## counts the number of basis
+def count_number_basis(seq):
+   number = len(seq)
+   return number
+
+## calculates the GC content
+def gc_content(seq): 
+   content = (seq.count('g')+seq.count('c'))/float(count_number_basis(seq))*100
+   return(content) 
+
+## calculates the GC ratio
+def gc_ratio(seq): 
+   content = (seq.count('g')+seq.count('c'))/float((seq.count('a')+seq.count('t')))
+   return(content) 
+
+## calculates the AT content
+def at_content(seq): 
+   content = (seq.count('a')+seq.count('t'))/float(count_number_basis(seq))*100
+   return(content) 
+
+## calculates the AT ratio
+def at_ratio(seq): 
+   content = (seq.count('a')+seq.count('t'))/float((seq.count('g')+seq.count('c')))
+   return(content) 
+
+## function to extract features from a gene sequence (more features can be easily added ) 
+def extract_features(seq,gene_id):
+ codon_counts = count_codons(seq)
+ codon_table = create_codon_table()
+ CU = [(codon, codon_table[codon], float(codon_counts[codon])/sum(codon_counts.values())) for codon in codon_counts.keys()]
+ headers_CU = ['feature','aminoacid',gene_id,]
+ df_CU = DataFrame(CU, columns=headers_CU)
+ df_CU = df_CU.sort_index(by=['feature'], ascending=[True]) ## codons are sorted in aphabetical order
+ X_CU = df_CU.ix[:,[0,2]]
+ names_other = ['cdi','number_codons','gc_content','gc_ratio','at_content','at_ratio'] ## add more features here
+ other = [codon_adaptation_index(seq),count_number_codons(seq),gc_content(seq),gc_ratio(seq),at_content(seq),at_ratio(seq)]
+ X_others = DataFrame([names_other,other]).T
+ X_others.columns = ['feature',gene_id]
+ df_features = concat([X_CU, X_others], ignore_index=True)
+ return(df_features)
+
+## function to plot the result of the lasso paths for different model selection criteria
+def plot_ic_criterion(model, name, color):
+    alpha_ = model.alpha_
+    alphas_ = model.alphas_
+    criterion_ = model.criterion_
+    pl.plot(-np.log10(alphas_), criterion_, '--', color=color,
+            linewidth=3, label='%s criterion' % name)
+    pl.axvline(-np.log10(alpha_), color=color, linewidth=3,
+               label='alpha: %s estimate' % name)
+    pl.xlabel('-log(alpha)')
+    pl.ylabel('criterion')
+
+def get_quantiles(fmin, m, s):
+	u = (fmin-m)/s	
+        phi = np.exp(-0.5 * u**2) / np.sqrt(2*np.pi)
+        Phi = 0.5 * erfc(-u / np.sqrt(2))
+	return (phi, Phi, u)
+
+def EImo(x,model,fmin,sign=1):
+	m, s = get_moments_mo(model, x)
+	phi, Phi, u = get_quantiles(fmin, m, s)	
+	f_acqu = sign * ((fmin-m) * Phi + s * phi)
+	return f_acqu  # note: returns negative value for posterior minimization 
+
+def eval(seq,seq_id,x_opt,scales):
+	x = extract_features(seq,seq_id)[seq_id]
+	feval = sum(scales*abs(np.array(x-x_opt)))
+	return(feval)	
+
+def get_moments_mo(model,x):
+	Ntest = x.shape[0]
+ 	ymeta = np.vstack([ np.zeros((Ntest,1)), np.ones((Ntest,1))]) .astype(int)
+	newX = np.hstack( [ np.vstack([x,x]), ymeta]  )
+	p =  model.predict(newX,Y_metadata={'output_index':ymeta},full_cov=True)
+	m = np.mean(p[0])
+	s = np.sqrt(np.mean(p[1]))
+	return [m, s]
+
+def get_min_mo(model):
+	x = model.X
+        Ntest = x.shape[0]/2
+        ymeta = np.vstack([ np.zeros((Ntest,1)), np.ones((Ntest,1))]) .astype(int)
+        p =  model.predict(model.X,Y_metadata={'output_index':ymeta},full_cov=True)
+	m = (p[0][0:Ntest] + p[0][Ntest:])/2
+	fmin = m[np.argmin(-m)]
+	return fmin
+
+
+
+
+
+
+
+
+
+
