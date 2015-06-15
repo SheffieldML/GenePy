@@ -26,7 +26,7 @@ print '--------------------------'
 print 'Genes processing started'
 print '--------------------------'
 ## We process each gene
-for k in range(10):
+for k in range(len(common_ids))[256:1000]:
     print 'Processing gene ... %s' % k
     
     # ID of the gene to process
@@ -66,7 +66,6 @@ for k in range(10):
     
 ## save data frames
 df_features.T.to_csv('./processed/features_genes.csv',sep=' ',header=True)
-    pass)  # save results
 df_sequences.T.to_csv('./processed/sequences_genes.csv',sep=' ',header=True) 
 
 print '--------------------------'
