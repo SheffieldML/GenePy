@@ -1,0 +1,18 @@
+### Script to extract all gene features
+
+# We split the processing so we can do it un parallel
+
+# extract from 0 to 1000
+run extract_features-run0.py
+
+# extract from 1000 to 2000
+run extract_features-run1000.py
+
+# extract from 2000 to 3000
+run extract_features-run2000.py
+
+# extract from 3000 to the end
+run extract_features-run3000.py
+
+
+
