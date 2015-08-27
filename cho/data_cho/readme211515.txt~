@@ -1,0 +1,19 @@
+# --- August 2015
+
+This folder contains the main datafiles from the 'CHO recombiant project'. The notebook 'process_data.ipnb', also is this folder, contains the code to merge this files into a unique
+database useful for later modelling purposes.
+
+
+# --- Raw datafiles description
+
+- mapping_table.csv: contains the different ids that are used across the files to indetify a gene/protein.
+
+- p2_h2l.csv: contains the protein degradation rates (kdp) and mRNA half-life (hl) calculated as schwanhausser (and using the robust method). cds ids are used.
+
+- 2pep_h2l: checking file. The ids of this file are the proteins identified with more that 2 peptides.
+
+- Galaxy116: transciptomics data. The id is reported as tracking_id and the mRNA abundancy as FPKM
+
+
+
+

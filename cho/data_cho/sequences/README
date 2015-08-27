@@ -1,0 +1,31 @@
+Javier Gonzalez // Mon 24 Aug 2015
+
+- cds_originla.fasta contains the cds annotated using the cds number
+
+- the 3utrs and 5utrs are divided in two files each. The reason for this is because of the direction in they were processed from the scafolds (REVERSE of FORWARD).
+
+# --- REVERSE: 
+5utrs are merged in the natural order and kept as 5utrs  (file merged_5UTR_to_5UTR.fasta)
+3utrs are reordered before merging and kept as 5utrs  (file merged_3UTR_to_3UTR.fasta)
+
+# --- FORWARD:
+5utrs are reordered and transformed renamed as 3utrs (file merged_5UTR_to_3UTR.fasta)
+3urrs are merged in the natural order and renamed as 5utrs (file merged_3UTR_to_5UTR.fasta)
+
+# --- all 5utrs are merged manually into 5utrs.fasta. Later, five is replaced by rna in all ids.
+# --- all 3utrs are merged manually into 3utrs.fasta. Later, three is replaced by rna in all ids.
+# --- the ids of the cds are translated to the rna ids using the script rename_cds.py. Some cds ids don’t have an associated ran code. In this case the sequence is ommited in the cds.fasta file.
+# --- The files with the ids of the fasta files are obtained using grep:
+
+grep '^>' cds.fasta > cds_id_temp.csv
+sed 's/^.//' <cds_id_temp.csv> cds_id.csv
+
+grep '^>' 5utr.fasta > 5utr_id_temp.csv
+sed 's/^.//' <5utr_id_temp.csv> 5utr_id.csv
+
+grep '^>' 3utr.fasta > 3utr_id_temp.csv
+sed 's/^.//' <3utr_id_temp.csv> 3utr_id.csv
+
+--- and from the cds_original without any trasnlation
+grep '^>' cds_original.fasta > cds_notranslated_id_temp.csv
+sed 's/^.//' <cds_notranslated_id_temp.csv> cds_notranslated_id.csv
