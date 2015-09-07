@@ -26,7 +26,7 @@ print '--------------------------'
 print 'Genes processing started'
 print '--------------------------'
 ## We process each gene
-for k in range(len(common_ids))[0:1000]:
+for k in range(len(common_ids)):
     print 'Processing gene ... %s' % k
     
     # ID of the gene to process

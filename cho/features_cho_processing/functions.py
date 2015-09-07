@@ -23,7 +23,7 @@ def process_fasta(name_origin,destination_name):
     while line!='':
         if list(line)[0]=='>':
             file_write.write('\n')
-            file_write.write(line[20:38]+ ' ')
+            file_write.write(line[1:]+ ' ')
    
         if list(line)[0]!='>':	
             line = line.replace("Sequence unavailable","NA")
