@@ -13,6 +13,20 @@ import random
 ## FUNCTIONS TO PRE-PROCESS THE FASTA FILES
 ## -----------------
 
+
+## replaces ns in a sequence by random nuceotides
+def replace_ns(seq):
+  while True:
+    x = seq.find('n')
+    if x >= 0:
+      seq = seq[:x] + random_sequence_generator(1) + seq[x+1:]
+    else:
+      break
+  return seq  
+
+def random_sequence_generator(size=3):
+  return ''.join([random.choice('atgc') for _ in range(size)])
+
 def process_fasta(name_origin,destination_name):
     file_read = open(name_origin,'r')
     file_write = open(destination_name,'w')
